@@ -17,6 +17,8 @@ extern uint8_t is_master;
 #define _LOWER 1
 #define _RAISE 2
 #define _ADJUST 3
+#define _GAME 4
+#define _GAME_LOWER 5
 
 
 enum custom_keycodes {
@@ -24,6 +26,8 @@ enum custom_keycodes {
   LOWER,
   RAISE,
   ADJUST,
+  GAME,
+  GAME_LOWER,
   BACKLIT,
   RGBRST
 };
@@ -71,7 +75,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
   [_ADJUST] = LAYOUT( \
   //,-----------------------------------------.                ,-----------------------------------------.
-      RESET,RGBRST, KC_NO, KC_NO, KC_NO, KC_NO,                  KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,\
+      RESET,RGBRST, KC_NO, KC_NO, KC_NO, KC_NO,                  KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,  GAME,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
     RGB_TOG,RGB_HUI,RGB_SAI,RGB_VAI,KC_NO,KC_NO,                 KC_NO, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,\
   //|------+------+------+------+------+------|                |------+------+------+------+------+------|
@@ -79,7 +83,29 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+------+------+------+------+------+------|  |------+------+------+------+------+------+------|
                    LALT_T(KC_DEL), LOWER, LSFT_T(KC_SPC),   LSFT_T(KC_ENT), RAISE, RALT_T(KC_BSPC) \
                 //`-------------------------------------'  `--------------------------------------'
-  )
+  ),
+  [_GAME] = LAYOUT(                                                   \
+  //,------------------------------------------.                   ,-------------------------------------------------.
+      KC_TAB,  KC_Q,  KC_W,  KC_E,  KC_R,  KC_T,                      KC_Y,  KC_U,    KC_I,   KC_O,    KC_P, KC_MINUS,\
+  //|-------+------+------+------+------+------|                   |------+------+--------+-------+--------+---------|
+     KC_LCTL,  KC_A,  KC_S,  KC_D,  KC_F,  KC_G,                      KC_H,  KC_J,    KC_K,   KC_L, KC_SCLN,  KC_QUOT, \
+  //|-------+------+------+------+------+------|                   |------+------+--------+-------+--------+---------|
+     KC_LSFT,  KC_Z,  KC_X,  KC_C,  KC_V,  KC_B,                      KC_N,  KC_M, KC_COMM, KC_DOT, KC_SLSH,    KC_AT,\
+  //|-------+------+------+------+------+------+--------|  |-------+------+------+--------+-------+--------+---------|
+                   LALT_T(KC_DEL), GAME_LOWER, KC_SPC,                  KC_ENT, KC_NO, RALT_T(KC_BSPC) \
+                //`-------------------------------------'  `--------------------------------------'
+  ),
+ [_GAME_LOWER] = LAYOUT( \
+  //,---------------------------------------------.                 ,--------------------------------------------------.
+     KC_ESC,  KC_F1,  KC_F2, KC_F3, KC_F4,   KC_F5,                   KC_PGUP,   KC_NO,  KC_UP,    KC_NO, KC_NO, QWERTY,\
+  //|------+-------+-------+------+------+--------|                 |--------+--------+-------+---------+------+-------|
+    KC_LCTL,  KC_F6,  KC_F7, KC_F8, KC_F9,  KC_F10,                   KC_PGDN, KC_LEFT,KC_DOWN, KC_RIGHT, KC_NO,  KC_NO,\
+  //|------+-------+-------+------+------+--------|                 |--------+--------+-------+---------+------+-------|
+    KC_LSFT, KC_F11, KC_F12, KC_NO, KC_NO, KC_PSCR,                     KC_NO,   KC_NO,  KC_NO,    KC_NO, KC_NO,  KC_NO,\
+  //|------+-------+-------+------+------+--------+-------|  |------+--------+--------+-------+---------+------+-------|
+                     LALT_T(KC_DEL), KC_NO, KC_SPC,                 KC_ENT, KC_NO, RALT_T(KC_BSPC) \
+                  //`-------------------------------------'  `--------------------------------------'
+  ),
 };
 
 int RGB_current_mode;
@@ -131,7 +157,7 @@ void matrix_render_user(struct CharacterMatrix *matrix) {
   if (is_master) {
     // If you want to change the display of OLED, you need to change here
     matrix_write_ln(matrix, read_layer_state());
-    /* matrix_write_ln(matrix, read_keylog()); */
+    //matrix_write_ln(matrix, read_keylog());
     //matrix_write_ln(matrix, read_keylogs());
     //matrix_write_ln(matrix, read_mode_icon(keymap_config.swap_lalt_lgui));
     //matrix_write_ln(matrix, read_host_led_state());
@@ -193,6 +219,18 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           layer_on(_ADJUST);
         } else {
           layer_off(_ADJUST);
+        }
+        return false;
+    case GAME:
+        if (record->event.pressed) {
+          persistent_default_layer_set(1UL<<_GAME);
+        }
+        return false;
+    case GAME_LOWER:
+        if (record->event.pressed) {
+          layer_on(_GAME_LOWER);
+        } else {
+          layer_off(_GAME_LOWER);
         }
         return false;
     case RGB_MOD:
