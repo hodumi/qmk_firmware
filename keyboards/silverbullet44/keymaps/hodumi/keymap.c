@@ -134,6 +134,66 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             break;
 #endif
+<<<<<<< HEAD
+=======
+        case KC_SCLN:
+            if (keyboard_report->mods & MOD_BIT(KC_LSFT)) {
+                if (record->event.pressed) {
+                    unregister_code(KC_LSFT);
+                    tap_code16(keycode);
+                    register_code(KC_LSFT);
+                }
+                /*  } else if (keyboard_report->mods & MOD_BIT(KC_RSFT)) {
+                    if (record->event.pressed) {
+                      unregister_code(KC_RSFT);
+                      tap_code16(keycode);
+                      register_code(KC_RSFT);
+                    } */
+            } else {
+                if (record->event.pressed) {
+                    tap_code16(S(keycode));
+                }
+            }
+            return false;
+            break;
+        case KC_00:
+            if (record->event.pressed) {
+                tap_code(KC_0);
+                register_code(KC_0);
+            } else {
+                unregister_code(KC_0);
+            }
+            return false;
+            break;
+        case S(ALTAB):
+        case ALTAB:
+            if (record->event.pressed) {
+                if (!alt_pressed) {
+                    alt_pressed = true;
+                    register_code(KC_LALT);
+                }
+                if (keycode == S(ALTAB)) {
+                    register_code(KC_LSFT);
+                }
+                register_code(KC_TAB);
+            } else {
+                unregister_code(KC_TAB);
+                if (keycode == S(ALTAB)) {
+                    unregister_code(KC_LSFT);
+                }
+            }
+            return false;
+            break;
+        default:
+            if (alt_pressed) {
+                alt_pressed = false;
+                unregister_code(KC_LALT);
+                if (record->event.pressed) {
+                    return false;
+                }
+            }
+            break;
+>>>>>>> 919712dcee751a416e7499bfa830ce2af78ebfcc
     }
     return true;
 }
