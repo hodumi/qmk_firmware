@@ -12,13 +12,14 @@ extern uint8_t is_master;
 // Each layer gets a name for readability, which is then used in the keymap matrix below.
 // The underscores don't mean anything - you can have a layer called STUFF or any other name.
 // Layer names don't all need to be of the same length, obviously, and you can also skip them
-// entirely and just use numbers.
+// entire
 #define _QWERTY 0
 #define _LOWER 1
 #define _RAISE 2
 #define _ADJUST 3
 #define _GAME 4
 #define _GAME_LOWER 5
+#define _GAME_RAISE 6
 
 
 enum custom_keycodes {
@@ -28,6 +29,7 @@ enum custom_keycodes {
   ADJUST,
   GAME,
   GAME_LOWER,
+  GAME_RAISE,
   BACKLIT,
   RGBRST
 };
@@ -92,7 +94,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|-------+------+------+------+------+------|                   |------+------+--------+-------+--------+---------|
      KC_LSFT,  KC_Z,  KC_X,  KC_C,  KC_V,  KC_B,                      KC_N,  KC_M, KC_COMM, KC_DOT, KC_SLSH,    KC_AT,\
   //|-------+------+------+------+------+------+--------|  |-------+------+------+--------+-------+--------+---------|
-                   LALT_T(KC_DEL), GAME_LOWER, KC_SPC,                  KC_ENT, KC_NO, RALT_T(KC_BSPC) \
+                   LALT_T(KC_DEL), GAME_LOWER, KC_SPC,                  KC_ENT, GAME_RAISE, RALT_T(KC_BSPC) \
                 //`-------------------------------------'  `--------------------------------------'
   ),
  [_GAME_LOWER] = LAYOUT( \
@@ -105,6 +107,17 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   //|------+-------+-------+------+------+--------+-------|  |------+--------+--------+-------+---------+------+-------|
                      LALT_T(KC_DEL), KC_NO, KC_SPC,                 KC_ENT, KC_NO, RALT_T(KC_BSPC) \
                   //`-------------------------------------'  `--------------------------------------'
+  ),
+  [_GAME_RAISE] = LAYOUT( \
+  //,-----------------------------------------.                ,----------------------------------------------------.
+     KC_ESC,  KC_1,  KC_2,  KC_3  ,KC_4  ,KC_5,                    KC_NO,   KC_NO, KC_LBRC, KC_RBRC,   KC_NO,  KC_NO,\
+  //|------+------+------+------+------+------|                |--------+--------+--------+--------+--------+-------|
+    KC_LCTL,  KC_6,  KC_7,  KC_8,  KC_9,  KC_0,                   KC_EQL,  KC_GRV, KC_LPRN, KC_RPRN,   KC_NO,  KC_NO,\
+  //|------+------+------+------+------+------|                |--------+--------+--------+--------+--------+-------|
+    KC_LSFT, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                  KC_BSLS,   KC_NO,   KC_NO,   KC_NO,   KC_NO,  KC_NO,\
+  //|------+------+------+------+------+------+------|  |------+--------+--------+--------+--------+--------+-------|
+                LALT_T(KC_DEL), KC_NO, LSFT_T(KC_SPC),   LSFT_T(KC_ENT), KC_NO, RALT_T(KC_BSPC) \
+             //`-------------------------------------'  `--------------------------------------'
   ),
 };
 
@@ -231,6 +244,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
           layer_on(_GAME_LOWER);
         } else {
           layer_off(_GAME_LOWER);
+        }
+        return false;
+    case GAME_RAISE:
+        if (record->event.pressed) {
+          layer_on(_GAME_RAISE);
+        } else {
+          layer_off(_GAME_RAISE);
         }
         return false;
     case RGB_MOD:
